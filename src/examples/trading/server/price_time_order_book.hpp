@@ -49,11 +49,27 @@ protected:
     bool operator<(const order& other) const;
   };
 
+  struct buy_comparator
+  {
+    bool operator() (const order& o1, const order& o2)
+    {
+      return std::tie(o1.price, o1.time) < std::tie(o2.price, o2.time);
+    }
+  };
+
+  struct sell_comparator
+  {
+    bool operator() (const order& o1, const order& o2)
+    {
+      return std::tie(o1.price,o1.time) > std::tie(o2.price,o2.time);
+    }
+  };
+
   std::experimental::strand<std::experimental::system_executor> strand_;
   market_data_bus& market_data_bus_;
   std::uint64_t next_time_;
-  std::priority_queue<order> buy_orders_;
-  std::priority_queue<order> sell_orders_;
+  std::priority_queue<order, std::vector<order>, buy_comparator> buy_orders_;
+  std::priority_queue<order, std::vector<order>, sell_comparator> sell_orders_;
 };
 
 #endif
